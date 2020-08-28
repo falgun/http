@@ -17,12 +17,13 @@ class Files extends AbstractValueBag
 
         foreach ($files as $field => $fileArray) {
             foreach ($fileArray['name'] as $key => $fileName) {
-                $file = [];
-                $file['name'] = $fileName;
-                $file['type'] = $files[$field]['type'][$key];
-                $file['tmp_name'] = $files[$field]['tmp_name'][$key];
-                $file['error'] = $files[$field]['error'][$key];
-                $file['size'] = $files[$field]['size'][$key];
+                $file = new File(
+                    $fileName,
+                    $files[$field]['type'][$key],
+                    $files[$field]['tmp_name'][$key],
+                    $files[$field]['size'][$key],
+                    $files[$field]['error'][$key],
+                );
 
                 $betterArray[$field][] = $file;
             }
