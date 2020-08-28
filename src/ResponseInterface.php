@@ -2,6 +2,9 @@
 
 namespace Falgun\Http;
 
+use Falgun\Http\Parameters\Cookies;
+use Falgun\Http\Parameters\Headers;
+
 interface ResponseInterface
 {
 
@@ -14,4 +17,8 @@ interface ResponseInterface
     public function getStatusCode(): int;
 
     public function getReasonPhrase(): string;
+
+    public function cookies(): Cookies;
+
+    public function headers(): Headers;
 }

@@ -9,20 +9,29 @@ use Falgun\Http\Parameters\Headers;
 class Response implements ResponseInterface
 {
 
-    public Headers $headers;
-    public Cookies $cookies;
+    protected Headers $headers;
+    protected Cookies $cookies;
     protected string $body;
     protected int $statusCode;
     protected string $reasonPhrase;
 
-    public function __construct(string $body = '', int $statusCode = 200, string $reasonPhrase = '')
+    public function __construct(string $body = '', int $statusCode = 200, string $reasonPhrase = 'OK')
     {
-
         $this->headers = new Headers();
         $this->cookies = new Cookies();
         $this->body = $body;
-        $this->statusCode = $statusCode;
-        $this->reasonPhrase = $reasonPhrase;
+        $this->setStatusCode($statusCode, $reasonPhrase);
+    }
+
+    public static function json($value, int $statusCode = 200, string $reasonPhrase = 'OK'): self
+    {
+        $json = json_encode($value, \JSON_THROW_ON_ERROR);
+
+        $response = new static($json, $statusCode, $reasonPhrase);
+
+        $response->headers()->set('Content-Type', 'application/json');
+
+        return $response;
     }
 
     public function getBody(): string
@@ -39,6 +48,10 @@ class Response implements ResponseInterface
 
     public function setStatusCode(int $code, string $reason = ''): self
     {
+        if ($code < 100 || $code > 599) {
+            throw new \InvalidArgumentException('http code must be between 100 to 599');
+        }
+
         $this->statusCode = $code;
         $this->reasonPhrase = $reason;
 
@@ -53,5 +66,15 @@ class Response implements ResponseInterface
     public function getReasonPhrase(): string
     {
         return $this->reasonPhrase;
+    }
+
+    public function cookies(): Cookies
+    {
+        return $this->cookies;
+    }
+
+    public function headers(): Headers
+    {
+        return $this->headers;
     }
 }
