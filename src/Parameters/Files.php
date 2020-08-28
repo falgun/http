@@ -11,7 +11,7 @@ class Files extends AbstractValueBag
         parent::__construct($this->prepareBetterFileArray($files));
     }
 
-    private function prepareBetterFileArray(array $files)
+    private function prepareBetterFileArray(array $files): array
     {
         $betterArray = [];
 

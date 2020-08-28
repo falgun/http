@@ -15,7 +15,7 @@ class Uri
     protected string $scheme;
     protected string $userInfo;
 
-    public function __construct(string $authority, string $fragment, string $host, string $path, int $port, string $query, string $scheme, string $userInfo)
+    public final function __construct(string $authority, string $fragment, string $host, string $path, int $port, string $query, string $scheme, string $userInfo)
     {
         $this->authority = $authority;
         $this->fragment = $fragment;
