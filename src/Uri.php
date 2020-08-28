@@ -29,15 +29,37 @@ class Uri
 
     public static function fromServerGlobal(array $server): self
     {
-        $authority = '';
-        $fragment = '';
-
         $scheme = self::detectScheme($server);
         [$host, $mayBePort] = self::detectHost($server);
         $path = self::detectPath($server['REQUEST_URI'] ?? '');
         $port = self::detectPort($server, $scheme, $mayBePort);
         $query = $server['QUERY_STRING'] ?? '';
+        $fragment = '';
+
         $userInfo = '';
+        $authority = '';
+
+        return new static($authority, $fragment, $host, $path, $port, $query, $scheme, $userInfo);
+    }
+
+    public static function fromString(string $url): self
+    {
+        $parts = parse_url($url);
+
+        $scheme = $parts['scheme'] ?? 'http';
+        $host = $parts['host'] ?? '';
+        $path = $parts['path'] ?? '/';
+        $port = $parts['port'] ?? 80;
+        $query = $parts['query'] ?? '';
+        $fragment = $parts['fragment'] ?? '';
+
+        if (isset($parts['user']) && isset($parts['pass'])) {
+            $userInfo = $parts['user'] . ':' . $parts['pass'];
+        } else {
+            $userInfo = '';
+        }
+        $authority = '';
+
 
         return new static($authority, $fragment, $host, $path, $port, $query, $scheme, $userInfo);
     }
@@ -98,7 +120,11 @@ class Uri
      */
     public function getAsString(): string
     {
-        return $this->scheme . '://' . $this->host . $this->path;
+        $port = $this->getPortAsStringIfNotDefault();
+        $query = !empty($this->query) ? '?' . $this->query : '';
+        $fragment = !empty($this->fragment) ? '#' . $this->fragment : '';
+
+        return $this->scheme . '://' . $this->host . $port . $this->path . $query . $fragment;
     }
 
     public function getSchemeHostPathWithoutDefaultPort(): string
@@ -112,6 +138,21 @@ class Uri
         }
 
         return $this->scheme . '://' . $this->host . $port . $this->path;
+    }
+
+    private function getPortAsStringIfNotDefault(): string
+    {
+        if ($this->port !== 80 && $this->port !== 443) {
+            // current port is not default http,https port
+            return ':' . $this->port;
+        }
+        //no need to show default port
+        return '';
+    }
+
+    public function __toString()
+    {
+        return $this->getAsString();
     }
 
     public function getAuthority(): string

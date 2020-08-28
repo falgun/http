@@ -37,4 +37,23 @@ class UriTest extends TestCase
         $this->assertEquals('http://localhost:8080/falgun-skeleton/public/',
             $uri->getSchemeHostPathWithoutDefaultPort());
     }
+
+    public function testUriFromString()
+    {
+        $uri = Uri::fromString('https://user:password@www.php.net:443/manual/en/function.parse-url.php?a=foo&b=bar#frag');
+
+        $this->assertEquals('https', $uri->getScheme());
+        $this->assertEquals('www.php.net', $uri->getHost());
+        $this->assertEquals(443, $uri->getPort());
+        $this->assertEquals('/manual/en/function.parse-url.php', $uri->getPath());
+        $this->assertEquals('a=foo&b=bar', $uri->getQuery());
+        $this->assertEquals('frag', $uri->getFragment());
+        $this->assertEquals('user:password', $uri->getUserInfo());
+
+
+        $this->assertEquals('https://www.php.net/manual/en/function.parse-url.php',
+            $uri->getSchemeHostPathWithoutDefaultPort());
+        $this->assertEquals('https://www.php.net/manual/en/function.parse-url.php?a=foo&b=bar#frag',
+            (string) $uri);
+    }
 }
