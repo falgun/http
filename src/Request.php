@@ -77,7 +77,7 @@ class Request implements RequestInterface
 
     public function getMethod(): string
     {
-        return $this->serverDatas->get('HTTP_METHOD', 'GET');
+        return \strtoupper($this->serverDatas->get('REQUEST_METHOD', 'GET'));
     }
 
     public function isGetMethod(): bool
@@ -97,7 +97,7 @@ class Request implements RequestInterface
 
     public function setMethod(string $method): self
     {
-        $this->serverDatas->set('HTTP_METHOD', \strtoupper($method));
+        $this->serverDatas->set('REQUEST_METHOD', \strtoupper($method));
 
         return $this;
     }

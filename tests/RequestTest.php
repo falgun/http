@@ -17,7 +17,7 @@ class RequestTest extends TestCase
             'SERVER_ADDR' => '127.0.0.1',
             'HTTP_HOST' => 'localhost:8080',
             'REQUEST_URI' => '/falgun-skeleton/public/?test=true',
-            'REQUEST_METHOD' => 'POST',
+            'REQUEST_METHOD' => 'post',
             'QUERY_STRING' => 'test=true',
             'REQUEST_SCHEME' => 'http',
         ];
@@ -29,6 +29,7 @@ class RequestTest extends TestCase
 
         $request = Request::createFromGlobals();
 
+        $this->assertEquals($request->getMethod(), 'POST');
         $this->assertEquals($request->uri()->getHost(), 'localhost');
         $this->assertEquals($request->queryDatas()->get('test'), 'true');
         $this->assertEquals($request->postDatas()->get('post'), 'true');
