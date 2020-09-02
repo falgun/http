@@ -10,7 +10,72 @@ use PHPUnit\Framework\TestCase;
 class UploadedFileTest extends TestCase
 {
 
-    public function testUploadedFileList()
+    public function testUploadedSingleFile()
+    {
+        $_FILES = [
+            'file1' => [
+                'name' => 'MyFile1.jpg',
+                'type' => 'image/jpeg',
+                'tmp_name' => '/tmp/php/php6hst32',
+                'error' => UPLOAD_ERR_OK,
+                'size' => 98174,
+            ],
+        ];
+
+        $request = Request::createFromGlobals();
+
+        $expected = new File(
+            'MyFile1.jpg',
+            'image/jpeg',
+            '/tmp/php/php6hst32',
+            98174,
+            UPLOAD_ERR_OK,
+        );
+
+        $this->assertEquals($expected, $request->files()->get('file1'));
+    }
+
+    public function testUploadedMultiFileList()
+    {
+        $_FILES = [
+            'file1' => [
+                'name' => 'MyFile1.jpg',
+                'type' => 'image/jpeg',
+                'tmp_name' => '/tmp/php/php6hst32',
+                'error' => UPLOAD_ERR_OK,
+                'size' => 98174,
+            ],
+            'file2' => [
+                'name' => 'MyFile2.png',
+                'type' => 'image/png',
+                'tmp_name' => '/tmp/php/php6hst33',
+                'error' => UPLOAD_ERR_OK,
+                'size' => 15555,
+            ],
+        ];
+
+        $request = Request::createFromGlobals();
+
+        $expectedFile1 = new File(
+            'MyFile1.jpg',
+            'image/jpeg',
+            '/tmp/php/php6hst32',
+            98174,
+            UPLOAD_ERR_OK,
+        );
+        $expectedFile2 = new File(
+            'MyFile2.png',
+            'image/png',
+            '/tmp/php/php6hst33',
+            15555,
+            UPLOAD_ERR_OK,
+        );
+
+        $this->assertEquals($expectedFile1, $request->files()->get('file1'));
+        $this->assertEquals($expectedFile2, $request->files()->get('file2'));
+    }
+
+    public function testUploadedFileArrayList()
     {
 
         $_FILES = [

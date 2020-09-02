@@ -21,6 +21,17 @@ class File
         $this->error = $error;
     }
 
+    public static function fromArray(array $fileArray): self
+    {
+        return new static(
+            $fileArray['name'],
+            $fileArray['type'],
+            $fileArray['tmp_name'],
+            $fileArray['size'],
+            $fileArray['error'],
+        );
+    }
+
     public function getName(): string
     {
         return $this->name;

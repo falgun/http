@@ -16,19 +16,35 @@ class Files extends AbstractValueBag
         $betterArray = [];
 
         foreach ($files as $field => $fileArray) {
-            foreach ($fileArray['name'] as $key => $fileName) {
-                $file = new File(
-                    $fileName,
-                    $files[$field]['type'][$key],
-                    $files[$field]['tmp_name'][$key],
-                    $files[$field]['size'][$key],
-                    $files[$field]['error'][$key],
-                );
 
-                $betterArray[$field][] = $file;
+            if (is_array($fileArray['name'])) {
+                // multiple file
+                $betterArray[$field] = $this->prepareMultiFileArray($fileArray);
+                continue;
             }
+
+            $betterArray[$field] = File::fromArray($fileArray);
         }
 
         return $betterArray;
+    }
+
+    private function prepareMultiFileArray(array $fileArray)
+    {
+        $multiFiles = [];
+
+        foreach ($fileArray['name'] as $key => $fileName) {
+            $file = new File(
+                $fileName,
+                $fileArray['type'][$key],
+                $fileArray['tmp_name'][$key],
+                $fileArray['size'][$key],
+                $fileArray['error'][$key],
+            );
+
+            $multiFiles[] = $file;
+        }
+
+        return $multiFiles;
     }
 }
