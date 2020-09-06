@@ -14,8 +14,19 @@ class Uri
     protected string $query;
     protected string $scheme;
     protected string $userInfo;
+    protected string $documentRoot;
 
-    public final function __construct(string $authority, string $fragment, string $host, string $path, int $port, string $query, string $scheme, string $userInfo)
+    public final function __construct(
+        string $authority,
+        string $fragment,
+        string $host,
+        string $path,
+        int $port,
+        string $query,
+        string $scheme,
+        string $userInfo,
+        string $documentRoot
+    )
     {
         $this->authority = $authority;
         $this->fragment = $fragment;
@@ -25,6 +36,7 @@ class Uri
         $this->query = $query;
         $this->scheme = $scheme;
         $this->userInfo = $userInfo;
+        $this->documentRoot = $documentRoot;
     }
 
     public static function fromServerGlobal(array $server): self
@@ -39,7 +51,19 @@ class Uri
         $userInfo = '';
         $authority = '';
 
-        return new static($authority, $fragment, $host, $path, $port, $query, $scheme, $userInfo);
+        $documentRoot = self::detectDocumentRoot($server);
+
+        return new static(
+            $authority,
+            $fragment,
+            $host,
+            $path,
+            $port,
+            $query,
+            $scheme,
+            $userInfo,
+            $documentRoot
+        );
     }
 
     public static function fromString(string $url): self
@@ -60,8 +84,19 @@ class Uri
         }
         $authority = '';
 
+        $documentRoot = '';
 
-        return new static($authority, $fragment, $host, $path, $port, $query, $scheme, $userInfo);
+        return new static(
+            $authority,
+            $fragment,
+            $host,
+            $path,
+            $port,
+            $query,
+            $scheme,
+            $userInfo,
+            $documentRoot
+        );
     }
 
     private static function detectHost(array $server): array
@@ -114,6 +149,20 @@ class Uri
         return $requsetUri;
     }
 
+    private static function detectDocumentRoot(array $server): string
+    {
+        $documentRoot = '';
+        $scriptFileNameIndex = \basename($server['SCRIPT_FILENAME']);
+
+        if ($scriptFileNameIndex === \basename($server['SCRIPT_NAME'])) {
+            $documentRoot = \dirname($server['SCRIPT_NAME']);
+        } else if ($scriptFileNameIndex === \basename($server['PHP_SELF'])) {
+            $documentRoot = \dirname($server['PHP_SELF']);
+        }
+
+        return rtrim($documentRoot, '/');
+    }
+
     /**
      * @todo implement this
      * @return string
@@ -127,17 +176,25 @@ class Uri
         return $this->scheme . '://' . $this->host . $port . $this->path . $query . $fragment;
     }
 
-    public function getSchemeHostPathWithoutDefaultPort(): string
+    public function getSchemeHostPath(): string
     {
-        if ($this->port !== 80 && $this->port !== 443) {
-            // current port is not default http,https port
-            $port = ':' . $this->port;
-        } else {
-            //no need to show default port
-            $port = '';
-        }
+        $port = $this->getPortAsStringIfNotDefault();
 
         return $this->scheme . '://' . $this->host . $port . $this->path;
+    }
+
+    public function getHostPath(): string
+    {
+        $port = $this->getPortAsStringIfNotDefault();
+
+        return $this->host . $port . $this->path;
+    }
+
+    public function getFullDocumentRootUrl(): string
+    {
+        $port = $this->getPortAsStringIfNotDefault();
+
+        return $this->scheme . '://' . $this->host . $port . $this->documentRoot;
     }
 
     private function getPortAsStringIfNotDefault(): string
@@ -193,5 +250,10 @@ class Uri
     public function getUserInfo(): string
     {
         return $this->userInfo;
+    }
+
+    public function getDocumentRoot(): string
+    {
+        return $this->documentRoot;
     }
 }

@@ -20,6 +20,9 @@ class RequestTest extends TestCase
             'REQUEST_METHOD' => 'post',
             'QUERY_STRING' => 'test=true',
             'REQUEST_SCHEME' => 'http',
+            'SCRIPT_FILENAME' => '/home/user/falgun-skeleton/public/index.php',
+            'SCRIPT_NAME' => '/falgun-skeleton/public/index.php',
+            'PHP_SELF' => '/falgun-skeleton/public/index.php',
         ];
         $_GET = ['test' => 'true'];
         $_POST = ['post' => 'true'];
